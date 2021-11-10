@@ -1,4 +1,10 @@
+import { useNavigate } from 'react-router-dom';
 const Navbar = () => {
+	const navigate = useNavigate();
+	const logout = () => {
+		localStorage.removeItem('token');
+		navigate('/');
+	};
 	return (
 		<nav class='navbar navbar-expand-lg navbar-light bg-light'>
 			<div className='container'>
@@ -21,9 +27,19 @@ const Navbar = () => {
 					<ul class='navbar-nav mr-auto'>
 						<li class='nav-item active'></li>
 					</ul>
-					<button class='btn btn-outline-secondary my-2 my-sm-0' type='button'>
-						Login
-					</button>
+					{localStorage.getItem('token') ? (
+						<button class='btn btn-outline-secondary my-2 my-sm-0' type='button' onClick={logout}>
+							Logout
+						</button>
+					) : (
+						<button
+							class='btn btn-outline-secondary my-2 my-sm-0'
+							type='button'
+							onClick={() => navigate('/login')}
+						>
+							Login
+						</button>
+					)}
 				</div>
 			</div>
 		</nav>

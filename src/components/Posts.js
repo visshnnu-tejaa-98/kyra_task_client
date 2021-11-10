@@ -149,7 +149,7 @@ const Posts = () => {
 								id='button-addon2'
 								onClick={handleFilter}
 							>
-								Button
+								Search
 							</button>
 						</div>
 					</div>

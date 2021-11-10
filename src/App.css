@@ -35,3 +35,13 @@
 	margin: 0.5rem;
 	font-weight: 600;
 }
+
+.login-card {
+	width: 25rem;
+}
+
+.autoContainer {
+	max-height: 70px;
+	overflow: scroll;
+	padding-left: 10px;
+}
