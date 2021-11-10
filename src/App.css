@@ -30,3 +30,8 @@
 	height: 100px;
 	margin-bottom: 10px;
 }
+
+.paginationBttns a {
+	margin: 0.5rem;
+	font-weight: 600;
+}
