@@ -1,10 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BACKEND_URL } from '../endpoints';
 
 const Posts = () => {
 	const [posts, setPosts] = useState(null);
+	const [filterPosts, setFilterPosts] = useState(null);
+	const [postNames, setPostNames] = useState(null);
+	const [display, setDisplay] = useState(false);
+	const [search, setSearch] = useState('');
+	const wrapperRef = useRef(null);
+
 	const navigate = useNavigate();
+	const postNamesArray = [];
+
 	const getPosts = async () => {
 		const req = await fetch(`${BACKEND_URL}/api/v1/user`, {
 			headers: {
@@ -13,7 +21,31 @@ const Posts = () => {
 		});
 		const res = await req.json();
 		setPosts(res.data);
+		setFilterPosts(res.data);
 		console.log(res);
+		res.data.map((post) => postNamesArray.push(post.name.toLocaleLowerCase()));
+		setPostNames(postNamesArray);
+		console.log(postNamesArray);
+	};
+
+	const handleClickOutside = (event) => {
+		const { current: wrap } = wrapperRef;
+		if (wrap && !wrap.contains(event.target)) {
+			setDisplay(false);
+		}
+	};
+
+	const updatePokeDex = (poke) => {
+		setSearch(poke);
+		setDisplay(false);
+	};
+
+	const handleFilter = () => {
+		console.log(search);
+		console.log(posts);
+		let filteredPosts = posts.filter((post) => post.name.toLocaleLowerCase() == search);
+		console.log(filteredPosts);
+		setFilterPosts(filteredPosts);
 	};
 
 	useEffect(() => {
@@ -35,28 +67,64 @@ const Posts = () => {
 		}
 	};
 
+	useEffect(() => {
+		window.addEventListener('mousedown', handleClickOutside);
+		return () => {
+			window.removeEventListener('mousedown', handleClickOutside);
+		};
+	});
+
 	return (
 		<div className='posts container'>
 			<h1 className='d-flex justify-content-center mt-2'>All Posts</h1>
 			<div>
-				<div class='input-group mb-3'>
-					<input
-						type='text'
-						class='form-control'
-						placeholder='Search'
-						aria-label='search'
-						aria-describedby='button-addon2'
-					/>
-					<div class='input-group-append'>
-						<button class='btn btn-outline-secondary' type='button' id='button-addon2'>
-							Button
-						</button>
+				<div ref={wrapperRef} className='flex-container flex-column pos-rel '>
+					<div class='input-group mb-3'>
+						<input
+							id='auto'
+							onClick={() => setDisplay(!display)}
+							placeholder='Type to search'
+							value={search}
+							onChange={(event) => setSearch(event.target.value)}
+							autocomplete='off'
+							class='form-control'
+							aria-label='search'
+							aria-describedby='button-addon2'
+						/>
+						<div class='input-group-append'>
+							<button
+								class='btn btn-outline-secondary'
+								type='button'
+								id='button-addon2'
+								onClick={handleFilter}
+							>
+								Button
+							</button>
+						</div>
 					</div>
+
+					{display && (
+						<div className='autoContainer'>
+							{postNames &&
+								postNames
+									.filter((post) => post.indexOf(search.toLocaleLowerCase()) > -1)
+									.map((post, i) => (
+										<div
+											onClick={() => updatePokeDex(post)}
+											className='option'
+											key={i}
+											tabIndex='0'
+										>
+											<span>{post}</span>
+										</div>
+									))}
+						</div>
+					)}
 				</div>
 			</div>
-			<div className='row '>
-				{posts &&
-					posts.map((post) => (
+			<div className='row'>
+				{filterPosts &&
+					filterPosts.map((post) => (
 						<div className='col col-sm-12 col-md-4 my-4 d-flex justify-content-center'>
 							<div class='card' style={{ width: '20rem' }}>
 								<div className='d-flex justify-content-between p-3'>
